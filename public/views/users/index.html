@@ -1,0 +1,164 @@
+{% extends "../page_layout.html" %}
+{% block content %}
+<link href="/css/bootstrap-dialog.min.css" rel="stylesheet">
+<div class="page-title">
+    <div class="title_left">
+        <h3>All User {{userdata}}</h3>
+    </div>
+    <div class="title_right">
+        <a href="/users/create"><button type="button" class="btn btn-primary">Create User </button></a>
+    </div>
+</div>
+<div class="clearfix"></div>
+<div class="row">
+    <div class="col-md-12">
+
+        {% if response.status == 400 %}
+        <div class="alert alert-danger alert-dismissible fade in" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+            <strong>MESSAGE : </strong> {{ response.message }}
+        </div>
+        {% endif %}
+        {% if response.status == 200 %}
+        <div class="alert alert-success alert-dismissible fade in" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+            <strong>MESSAGE : </strong> {{ response.message }}
+        </div>
+        {% endif %}
+        <div class="x_panel">
+        <div class="x_content">
+            <form action="/users" method="POST" class="form-horizontal form-label-left" novalidate>
+               <div class="item form-group">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-12" for="name">Name </label>
+                  <div class="col-md-6 col-sm-6 col-xs-12">
+                     <input id="name"  class="form-control col-md-7 col-xs-12"  name="txtname" placeholder="both name(s) e.g Jon Doe"  type="text" value="{{ search.txtname }}">
+                  </div>
+               </div>
+               <div class="item form-group">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-12" for="email">Email </label>
+                  <div class="col-md-6 col-sm-6 col-xs-12">
+                     <input type="text" id="txtemail" name="txtemail" placeholder="email@test.com" value="{{ search.txtemail }}" class="form-control col-md-7 col-xs-12">
+                  </div>
+               </div>
+               <div class="item form-group">
+                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="email">Group </label>
+                    <div class="col-md-6 col-sm-6 col-xs-12">
+                        <select class="form-control" id="group" name="selgroup" >
+                            <option value="">Choose Group</option>
+                            <option value="Administrator" {% if search.selgroup == 'Administrator' %}selected{% endif %}>Administrator</option>
+                            <option value="Member" {% if search.selgroup == 'Member' %}selected{% endif %}>Member</option>
+                            <option value="Guest" {% if search.selgroup == 'Guest' %}selected{% endif %}>Guest</option>
+                        </select>
+                    </div>
+               </div>
+               <div class="item form-group">
+                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="email">Status </label>
+                    <div class="col-md-6 col-sm-6 col-xs-12">
+                        <select class="form-control" name="selstatus" id="status" >
+                            <option value="">Choose Status</option>
+                            <option value="published" {% if search.selstatus == 'published' %}selected{% endif %}>published</option>
+                            <option value="unpublished" {% if search.selstatus == 'unpublished' %}selected{% endif %}>unpublished</option>
+                        </select>
+                    </div>
+               </div>
+               <div class="form-group">
+                  <div class="col-md-6 col-md-offset-3">
+                    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+                     <button id="send" type="submit" class="btn btn-success">Search</button>
+                     <button type="reset" class="btn btn-primary">Clear</button>
+                  </div>
+               </div>
+            </form>
+            <div class="ln_solid"></div>
+        <table class="table table-striped responsive-utilities jambo_table bulk_action">
+           <thead>
+              <tr class="headings">
+                 <th class="column-title">ID </th>
+                 <th class="column-title">Email </th>
+                 <th class="column-title">Name </th>
+                 <th class="column-title">Group </th>
+                 <th class="column-title">Status </th>
+                 <th class="column-title no-link last"><span class="nobr">Manage</span>
+                 </th>
+                 <th class="bulk-actions" colspan="7">
+                    <a class="antoo" style="color:#fff; font-weight:500;">Bulk Actions ( <span class="action-cnt"> </span> ) <i class="fa fa-chevron-down"></i></a>
+                 </th>
+              </tr>
+           </thead>
+           <tbody>
+            {% for item in data %}
+              <tr class="{{ $index %2 == 0 ? 'even pointer': 'odd pointer'}}" >
+                 <td class=" "> {{ item._id }} </td>
+                 <td class=" "> {{ item.email }} </td>
+                 <td class=" "> {{ item.name }} </td>
+                 <td class=" "> {{ item.group }} </td>
+                 <td class="a-right a-right "> {{ item.status }} </td>
+                 <td class=" last">
+                    <form accept-charset="utf-8">
+                      <input type="hidden" id="_csrf" name="_csrf" value="{{csrfToken}}">
+                      <a href="/users/edit/{{ item._id }}"><button type="button" class="btn btn-warning">edit</button></a>
+                      <button type="button" onclick="deleteUser({{ item._id }})" class="btn btn-danger">Delete</button>                
+                    </form>
+                    
+                 </td>
+              </tr>
+            {% endfor %}
+           </tbody>
+        </table>
+        <div style="height: 100px">
+        <nav>
+            {% if data_pagination.total > data_pagination.per_page %}
+                {% autoescape false %} {{ pagination }} {% endautoescape %} total {{ data_pagination.total }} items.
+            {% endif %}
+            
+        </nav>
+        </div>
+        </div>
+        </div>
+    </div>
+</div>
+
+<script src="/js/bootstrap-dialog.min.js"></script>
+<script>
+
+function deleteUser(itemID){
+    BootstrapDialog.show({
+        title: 'ลบข้อมูล ?',
+        message: 'คุณต้องการลบข้อมูลนี้ใช่ไหรือไม่',
+            buttons: [{
+                label: 'Ok',
+                action: function(dialog) {
+                    $.post("/users/destroy",
+                    {
+                        id: itemID,
+                        _csrf : $('#_csrf').val()
+                    }, function (data) {
+                        
+                        dialog.close();
+                        BootstrapDialog.show({
+                            message: data.message,
+                            closable: false,
+                            buttons: [{
+                                label: 'Close',
+                                cssClass: 'btn-warning',
+                                action: function(dialogRef){
+                                    dialogRef.close();
+                                    window.location = '/users';
+                                }
+                            }]
+                        });
+                    });
+                }
+            }, {
+                label: 'Cancel',
+                action: function(dialog) {
+                    dialog.close();
+                }
+            }]
+        });
+
+    
+}
+
+</script>
+{% endblock %}

@@ -1,0 +1,21 @@
+{
+  "dependencies": {
+    "body-parser": "^1.15.0",
+    "connect-flash": "^0.1.1",
+    "cookie-parser": "^1.4.1",
+    "csurf": "^1.8.3",
+    "express": "^4.13.4",
+    "express-session": "^1.13.0",
+    "moment": "^2.12.0",
+    "moment-timezone": "^0.5.2",
+    "mongoose": "^4.4.5",
+    "mongoose-paginate": "^5.0.0",
+    "multer": "^1.1.0",
+    "passport": "^0.3.2",
+    "passport-local": "^1.0.0",
+    "passport-local-mongoose": "^4.0.0",
+    "super-pagination": "^0.5.12",
+    "swig": "^1.4.2",
+    "xlsx": "^0.8.0"
+  }
+}
